@@ -65,3 +65,32 @@ bookmarkRouter
             .location(`http://localhost:8000/bookmarks/${id}`)
             .json(bookmark)
     })
+
+bookmarkRouter
+    .route('/bookmarks/:id')
+    .get((req, res) => {
+        const { id } = req.params;
+
+        const bookmark = bookmarks.find(b => b.id == id)
+
+        if(!bookmark) {
+            logger.error(`Bookmark with id ${id} not found`)
+            return res
+                .status(404)
+                .send('Card not found')
+        }
+
+        res.json(card)
+    })
+    .delete((req, res) => {
+        const { id } = req.params;
+
+        const bookmarkIndex = bookmarks.findIndex(b => b.id == id)
+
+        if(bookmarkIndex === -1) {
+            logger.error(`Bookmark with id ${id} could not be found`)
+            return res
+                .status(404)
+                .send('Bookmark not found')
+        }
+    })
