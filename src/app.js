@@ -5,6 +5,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const winston = require('winston')
+const bookmarkRouter = require('../bookmarks/bookmark-router');
 
 const logger = winston.createLogger({
   level: 'info',
@@ -42,6 +43,8 @@ app.use(function validateBearerToken(req, res, next) {
 
     next();
 })
+
+app.use(bookmarkRouter)
 
 app.get('/', (req, res) => {
     res.send('Hello, boilerplate!')
