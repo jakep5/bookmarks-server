@@ -7,19 +7,6 @@ const { NODE_ENV } = require('./config')
 const winston = require('winston')
 const bookmarkRouter = require('../bookmarks/bookmark-router');
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'info.log' })
-  ]
-});
-
-if (NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
-}
 
 const app = express()
 
