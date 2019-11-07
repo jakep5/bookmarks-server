@@ -93,4 +93,14 @@ bookmarkRouter
                 .status(404)
                 .send('Bookmark not found')
         }
+
+        bookmarks.splice(bookmarkIndex, 1);
+
+        logger.info(`Bookmark with id ${id} successfully deleted.`)
+
+        res
+            .status(204)
+            .end();
     })
+
+module.exports = bookmarkRouter
