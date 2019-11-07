@@ -1,8 +1,8 @@
 const express = require('express')
 const uuid = require('uuid/v4')
-const logger = require('../logger')
+const logger = require('../src/logger')
 
-const { bookmarks } = require('../store')
+const { bookmarks } = require('../src/store')
 
 const bookmarkRouter = express.Router()
 const bodyParser = express.json()
@@ -77,10 +77,10 @@ bookmarkRouter
             logger.error(`Bookmark with id ${id} not found`)
             return res
                 .status(404)
-                .send('Card not found')
+                .send('Bookmark not found')
         }
 
-        res.json(card)
+        res.json(bookmark)
     })
     .delete((req, res) => {
         const { id } = req.params;
