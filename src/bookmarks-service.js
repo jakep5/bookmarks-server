@@ -1,6 +1,6 @@
 const BookmarksService = {
     getAllBookmarks(knex) {
-        return knex.select('*').from('BookmarksService')    
+        return knex.select('*').from('bookmarks_drill')    
     },
     insertBookmark(knex, newBookmark) {
         return knex
@@ -26,4 +26,4 @@ const BookmarksService = {
     },
 }
 
-module.exports = ArticlesService;
+module.exports = BookmarksService;

@@ -4,7 +4,6 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
-const bookmarkRouter = require('../bookmarks/bookmark-router');
 const BookmarksService = require('./bookmarks-service')
 
 
@@ -17,7 +16,6 @@ const morganOption = (NODE_ENV === 'production')
 app.use(morgan(morganOption))
 app.use(helmet())
 app.use(cors())
-app.use(express.json())
 
 app.use(function validateBearerToken(req, res, next) {
     const apiToken = process.env.API_TOKEN
@@ -30,8 +28,6 @@ app.use(function validateBearerToken(req, res, next) {
 
     next();
 })
-
-app.use(bookmarkRouter)
 
 app.get('/', (req, res) => {
     res.send('Hello, boilerplate!')
@@ -46,7 +42,7 @@ app.get('/bookmarks', (req, res, next) => {
         .catch(next)
 })
 
-app.get('/articles/:bookmark_id', () => {
+app.get('/bookmarks/:bookmark_id', (req, res, next) => {
     const knexInstance = req.app.get('db')
     BookmarksService.getById(knexInstance, req.params.bookmark_id)
         .then(bookmark => {
