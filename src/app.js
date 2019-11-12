@@ -8,6 +8,7 @@ const BookmarksService = require('./bookmarks-service')
 
 
 const app = express()
+const jsonParser = express.json()
 
 const morganOption = (NODE_ENV === 'production')
     ? 'tiny'
@@ -22,7 +23,7 @@ app.use(function validateBearerToken(req, res, next) {
     const authToken = req.get('Authorization')
 
     if(!authToken || authToken.split(' ')[1] !== apiToken) {
-        logger.error(`Unauthorized request to path ${req.path}`)
+/*         logger.error(`Unauthorized request to path ${req.path}`) */
         return res.status(401).json({error:'Unauthorized request'})
     }
 
@@ -55,6 +56,42 @@ app.get('/bookmarks/:bookmark_id', (req, res, next) => {
         })
         .catch(next)
 })
+
+app.post('/', jsonParser, (req, res, next) => {
+    const { title, url, description, rating } = req.body
+    const newBookmark = { title, url, description, rating }
+
+    for (const [key, value] of Object.entries(newBookmark)) {
+        if(value == null) {
+            return res.status(400).json({
+                error: { message: `Missing '${key}' in request body`}
+            })
+        }
+    }
+
+    BookmarksService.insertBookmark(
+        req.app.get('db'),
+        newBookmark
+    )
+        .then(bookmark => {
+            res
+                .status(201)
+                .location(`/bookmarks/${bookmark.id}`)
+                json(bookmark)
+        })
+        .catch(next)
+})
+
+app.delete('/bookmarks/:bookmark_id', (req, res, next) => {
+    BookmarksService.deleteBookmark(
+        req.app.get('db'),
+        req.params.bookmark_id
+    )
+        .then(() => {
+            res.status(204).end()
+        })
+        .catch(next)
+} )
 
 app.use(function errorHandler(error, req, res, next) {
     let response
