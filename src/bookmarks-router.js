@@ -33,7 +33,7 @@ bookmarksRouter
                 res
                     .status(201)
                     .location(`/bookmarks/${bookmark.id}`)
-                    json(bookmark)
+                    .json(bookmark)
             })
             .catch(next)
     })
