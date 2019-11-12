@@ -6,9 +6,11 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const BookmarksService = require('./bookmarks-service')
 
+const bookmarksRouter = require('./bookmarks-router')
+
 
 const app = express()
-const jsonParser = express.json()
+
 
 const morganOption = (NODE_ENV === 'production')
     ? 'tiny'
@@ -30,68 +32,12 @@ app.use(function validateBearerToken(req, res, next) {
     next();
 })
 
+app.use('/bookmarks', bookmarksRouter)
+
 app.get('/', (req, res) => {
     res.send('Hello, boilerplate!')
 })
 
-app.get('/bookmarks', (req, res, next) => {
-    const knexInstance = req.app.get('db')
-    BookmarksService.getAllBookmarks(knexInstance)
-        .then(bookmarks => {
-            res.json(bookmarks)
-        })
-        .catch(next)
-})
-
-app.get('/bookmarks/:bookmark_id', (req, res, next) => {
-    const knexInstance = req.app.get('db')
-    BookmarksService.getById(knexInstance, req.params.bookmark_id)
-        .then(bookmark => {
-            if(!bookmark) {
-                return res.status(404).json({
-                    error: { message: 'Bookmark does not exist' }
-                })
-            }
-            res.json(bookmark)
-        })
-        .catch(next)
-})
-
-app.post('/', jsonParser, (req, res, next) => {
-    const { title, url, description, rating } = req.body
-    const newBookmark = { title, url, description, rating }
-
-    for (const [key, value] of Object.entries(newBookmark)) {
-        if(value == null) {
-            return res.status(400).json({
-                error: { message: `Missing '${key}' in request body`}
-            })
-        }
-    }
-
-    BookmarksService.insertBookmark(
-        req.app.get('db'),
-        newBookmark
-    )
-        .then(bookmark => {
-            res
-                .status(201)
-                .location(`/bookmarks/${bookmark.id}`)
-                json(bookmark)
-        })
-        .catch(next)
-})
-
-app.delete('/bookmarks/:bookmark_id', (req, res, next) => {
-    BookmarksService.deleteBookmark(
-        req.app.get('db'),
-        req.params.bookmark_id
-    )
-        .then(() => {
-            res.status(204).end()
-        })
-        .catch(next)
-} )
 
 app.use(function errorHandler(error, req, res, next) {
     let response
