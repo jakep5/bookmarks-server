@@ -1,7 +1,16 @@
 const express = require('express')
 const BookmarksService = require('./bookmarks-service')
+const xss = require('xss')
 const bookmarksRouter = express.Router()
 const jsonParser = express.json()
+
+const serializeBookmark = bookmark => ({
+    id: bookmark.id,
+    title: xss(bookmark.title),
+    url: xss(bookmark.url),
+    description: xss(bookmark.description),
+    rating: bookmark.rating
+})
 
 bookmarksRouter
     .route('/')
@@ -9,7 +18,7 @@ bookmarksRouter
         const knexInstance = req.app.get('db')
         BookmarksService.getAllBookmarks(knexInstance)
             .then(bookmarks => {
-                res.json(bookmarks)
+                res.json(bookmarks.map(serializeBookmark))
             })
             .catch(next)
     })
@@ -33,7 +42,7 @@ bookmarksRouter
                 res
                     .status(201)
                     .location(`/bookmarks/${bookmark.id}`)
-                    .json(bookmark)
+                    .json(serializeBookmark(bookmark))
             })
             .catch(next)
     })
@@ -54,7 +63,7 @@ bookmarksRouter
             .catch(next)
     })
     .get((req, res, next) => {
-        res.json(res.bookmark)
+        res.json(serializeBookmark(res.bookmark))
     })
     .delete((req, res, next) => {
         BookmarksService.deleteBookmark(
